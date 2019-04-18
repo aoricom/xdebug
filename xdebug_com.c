@@ -485,14 +485,8 @@ int xdebug_is_debug_connection_active()
 
 int xdebug_is_debug_connection_active_for_current_pid()
 {
-	/* Start debugger if previously a connection was established and this
-	 * process no longer has the same PID */
-	if ((xdebug_is_debug_connection_active() && (XG(remote_connection_pid) != getpid()))) {
-		xdebug_restart_debugger();
-	}
-
 	return (
-		XG(remote_connection_enabled) && (XG(remote_connection_pid) == getpid())
+		XG(remote_connection_enabled)
 	);
 }
 
@@ -554,7 +548,7 @@ static int xdebug_handle_start_session()
 	) {
 		convert_to_string_ex(dummy);
 		xdebug_update_ide_key(Z_STRVAL_P(dummy));
-		
+
 		xdebug_setcookie("XDEBUG_SESSION", sizeof("XDEBUG_SESSION") - 1, Z_STRVAL_P(dummy), Z_STRLEN_P(dummy), time(NULL) + XG(remote_cookie_expire_time), "/", 1, NULL, 0, 0, 1, 0);
 		activate_session = 1;
 	} else if (
@@ -562,7 +556,7 @@ static int xdebug_handle_start_session()
 	) {
 		convert_to_string_ex(dummy);
 		xdebug_update_ide_key(Z_STRVAL_P(dummy));
-		
+
 		activate_session = 1;
 	} else if (getenv("XDEBUG_CONFIG")) {
 		if (XG(ide_key) && *XG(ide_key) && !SG(headers_sent)) {
@@ -602,6 +596,6 @@ void xdebug_do_req(void)
 	) {
 		xdebug_init_debugger();
 	}
-	
+
 	xdebug_handle_stop_session();
 }
